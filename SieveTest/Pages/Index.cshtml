@@ -1,0 +1,145 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="testform" method="post" asp-page="Index">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label asp-for="@Model.UpdateSuperHeroVm.Name"></label>
+                        <input id="superHeroName" asp-for="@Model.UpdateSuperHeroVm.Name" class="form-control" />
+                        <span asp-validation-for="@Model.UpdateSuperHeroVm.Name" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button id="saveHero" type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="toolbar">
+    <button id="remove" class="btn btn-danger" disabled>
+        <i class="glyphicon glyphicon-remove"></i> Delete
+    </button>
+</div>
+<table data-toggle="table"
+       data-unique-id="Id"
+       data-url="@Url.Page("Index", "LoadData")"
+       id="table"
+       data-toolbar="#toolbar"
+       data-filter-control="true"
+       data-search="true"
+       data-show-refresh="true"
+       data-show-toggle="true"
+       data-show-fullscreen="true"
+       data-show-columns="true"
+       data-show-columns-toggle-all="true"
+       data-detail-view="true"
+       data-show-export="true"
+       data-click-to-select="true"
+       @*data-detail-formatter="detailFormatter"*@
+       data-minimum-count-columns="2"
+       data-show-pagination-switch="true"
+       data-pagination="true"
+       data-show-extended-pagination="true"
+       data-total-not-filtered-field="totalNotFiltered"
+       data-id-field="id"
+       data-page-list="[10, 25, 50, 100, all]"
+       data-show-footer="true"
+       data-side-pagination="server">
+    <thead>
+        <tr>
+            <th data-formatter="operateFormatter">Actions</th> @*data-events="operateEvents"*@
+            <th data-field="id">ID</th>
+            <th data-field="name" data-filter-control="input" data-sortable="true">Name</th>
+            <th data-field="gender" data-filter-control="input" data-sortable="true">Gender</th>
+            <th data-field="eyeColor" data-filter-control="input" data-sortable="true">Eye Color</th>
+            <th data-field="race" data-filter-control="input" data-sortable="true">Race</th>
+            <th data-field="hairColor" data-filter-control="input" data-sortable="true">Hair Color</th>
+            <th data-field="height" data-filter-control="input" data-sortable="true">Height</th>
+            <th data-field="publisher" data-filter-control="input" data-sortable="true">Publisher</th>
+            <th data-field="skinColor" data-filter-control="input" data-sortable="true">Skin Color</th>
+            <th data-field="alignment" data-filter-control="input" data-sortable="true">Alignment</th>
+            <th data-field="weight" data-filter-control="input" data-sortable="true">Weight</th>
+        </tr>
+    </thead>
+
+</table>
+
+@section scripts{
+
+    <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
+    <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/extensions/export/bootstrap-table-export.min.js"></script>
+
+    <script>
+        function operateFormatter(value, row, index) {
+            return [
+                //'<a class="like" href="javascript:void(0)" title="Like">',
+                //'<i class="fa fa-heart"></i>',
+                //'</a>  ',
+                //'<a class="remove" href="javascript:void(0)" title="Remove">',
+                //'<i class="fa fa-trash"></i>',
+                //'</a>'
+                '<button id="'+row.id + '" ', 'data-name="' + row.name + '" ',
+                'type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">',
+                'Edit',
+                '</button>'
+            ].join('')
+        }
+
+        //operateEvents = {
+        //    'click .like': function (e, value, row, index) {
+        //        alert('You click like action, row: ' + JSON.stringify(row))
+        //    },
+        //    'click .remove': function (e, value, row, index) {
+        //        $table.bootstrapTable('remove', {
+        //            field: 'id',
+        //            values: [row.id]
+        //        })
+        //    }
+        //}
+
+        // Execute something when the modal window is shown.
+        $('#exampleModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var recipient = button.data('name'); // Extract info from data-* attributes
+            // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+            // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+            var modal = $(this);
+            modal.find('.modal-title').text('New message to ' + recipient);
+            modal.find('#superHeroName').val(recipient);
+
+            var savebutton = modal.find('#saveHero');
+            savebutton.click(function (e) {
+                e.preventDefault();
+
+                $.post(this.baseURI + 'Index', $("#testform").serialize()).done(function (data) {
+                    alert(data)
+                });
+            });
+
+        });
+    </script>
+}
